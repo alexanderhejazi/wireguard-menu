@@ -5,6 +5,18 @@ import XCTest
 
 final class TunnelControlsTests: XCTestCase {
     @MainActor
+    func testReconnectIsAvailableForEveryTunnelStatus() async throws {
+        let tunnel = Tunnel(path: "/tmp/office.conf")
+        for status in [TunnelStatus.running("utun42"), .stopped, .unknown] {
+            let controls = AppDelegate().connectionMenuItems(for: tunnel, status: status)
+            let reconnect = try XCTUnwrap(controls.first { $0.title == "Reconnect" })
+            XCTAssertTrue(reconnect.isEnabled)
+            XCTAssertEqual(reconnect.action, NSSelectorFromString("reconnectTunnel:"))
+            XCTAssertEqual(reconnect.representedObject as? String, tunnel.path)
+        }
+    }
+
+    @MainActor
     func testDisconnectRemainsAvailableWithoutReadableRuntimeState() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

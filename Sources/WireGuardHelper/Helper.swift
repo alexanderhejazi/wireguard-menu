@@ -19,7 +19,7 @@ final class HelperSession: NSObject, WireGuardHelperProtocol {
 
     func change(_ path: String, action: String, withReply reply: @escaping @Sendable (Int32, String) -> Void) {
         guard let action = TunnelAction(rawValue: action), validateConfigurationPath(path, home: home) else {
-            reply(-1, "Select a .conf file inside your home folder and use Connect or Disconnect.")
+            reply(-1, "Select a .conf file inside your home folder and use Connect, Disconnect, or Reconnect.")
             return
         }
         commands.async {
@@ -28,13 +28,25 @@ final class HelperSession: NSObject, WireGuardHelperProtocol {
                 reply(-1, "Install wireguard-tools and wireguard-go with Homebrew.")
                 return
             }
-            let result = runCommand("/usr/bin/env", arguments: [
-                "-i", "PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
-                "HOME=/var/root", executable, action.rawValue, path
-            ])
+            let run = { (command: String) in
+                runCommand("/usr/bin/env", arguments: [
+                    "-i", "PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+                    "HOME=/var/root", executable, command, path
+                ])
+            }
+            let result = action == .reconnect
+                ? reconnectTunnel(status: { Tunnel(path: path).status() }, run: run)
+                : run(action.rawValue)
             reply(result.code, result.output)
         }
     }
+}
+
+func reconnectTunnel(status: () -> TunnelStatus, run: (String) -> CommandResult) -> CommandResult {
+    let disconnected = run("down")
+    // wg-quick down also fails when the tunnel has already disappeared.
+    guard disconnected.code == 0 || status() == .stopped else { return disconnected }
+    return run("up")
 }
 
 final class HelperDelegate: NSObject, NSXPCListenerDelegate {
