@@ -4,6 +4,42 @@ import WireGuardCore
 @testable import WireGuardHelper
 
 final class HelperTests: XCTestCase {
+    func testReconnectDisconnectsBeforeConnectingAndReturnsConnectResult() {
+        var commands: [String] = []
+        let result = reconnectTunnel(status: { .running("utun42") }) { command in
+            commands.append(command)
+            return command == "down"
+                ? CommandResult(code: 0, output: "Disconnected")
+                : CommandResult(code: 1, output: "Connection failed")
+        }
+        XCTAssertEqual(commands, ["down", "up"])
+        XCTAssertEqual(result.code, 1)
+        XCTAssertEqual(result.output, "Connection failed")
+    }
+
+    func testReconnectConnectsWhenTunnelHasAlreadyStopped() {
+        var commands: [String] = []
+        let result = reconnectTunnel(status: { .stopped }) { command in
+            commands.append(command)
+            return CommandResult(code: command == "down" ? 1 : 0, output: command)
+        }
+        XCTAssertEqual(commands, ["down", "up"])
+        XCTAssertEqual(result.code, 0)
+    }
+
+    func testReconnectStopsOnDisconnectFailureUnlessTunnelIsStopped() {
+        for status in [TunnelStatus.running("utun42"), .unknown] {
+            var commands: [String] = []
+            let result = reconnectTunnel(status: { status }) { command in
+                commands.append(command)
+                return CommandResult(code: 1, output: "Disconnect failed")
+            }
+            XCTAssertEqual(commands, ["down"])
+            XCTAssertEqual(result.code, 1)
+            XCTAssertEqual(result.output, "Disconnect failed")
+        }
+    }
+
     func testOnlyConfigurationPathsWithinClientHomeAreAccepted() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

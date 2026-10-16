@@ -29,7 +29,7 @@ public enum HelperService {
 }
 
 public enum TunnelAction: String, Sendable {
-    case up, down
+    case up, down, reconnect
 }
 
 public func validateConfigurationPath(_ path: String, home: URL) -> Bool {

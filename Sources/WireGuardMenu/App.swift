@@ -158,7 +158,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let disconnect = entry("Disconnect", action: #selector(disconnectTunnel(_:)), path: tunnel.path)
         // Keep recovery available even if a status request failed.
         disconnect.isEnabled = busyPath == nil
-        return [connect, disconnect]
+        let reconnect = entry("Reconnect", action: #selector(reconnectTunnel(_:)), path: tunnel.path)
+        reconnect.isEnabled = busyPath == nil
+        return [connect, disconnect, reconnect]
     }
 
     @objc private func removeTunnel(_ sender: NSMenuItem) {
@@ -179,6 +181,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func disconnectTunnel(_ sender: NSMenuItem) {
         changeTunnel(sender, action: "down")
+    }
+
+    @objc private func reconnectTunnel(_ sender: NSMenuItem) {
+        changeTunnel(sender, action: "reconnect")
     }
 
     private func changeTunnel(_ sender: NSMenuItem, action: String) {
@@ -203,7 +209,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             rebuildMenu()
             refreshStatus()
             if result.code != 0 {
-                showError("Could not \(action == "up" ? "connect" : "disconnect") \(tunnel.name)", result.output)
+                let verb = action == "reconnect" ? "reconnect" : (action == "up" ? "connect" : "disconnect")
+                showError("Could not \(verb) \(tunnel.name)", result.output)
             }
         }
     }
