@@ -95,6 +95,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             menu.addItem(entry("Enable password-free control…", action: #selector(enableHelper)))
         }
         menu.addItem(entry("Helper settings…", action: #selector(helperSettings)))
+        let login = entry("Launch at login", action: #selector(toggleLaunchAtLogin))
+        login.state = SMAppService.mainApp.status == .enabled ? .on : .off
+        menu.addItem(login)
         let hint = entry("Running indicates an interface, not reachability")
         hint.isEnabled = false
         menu.addItem(hint)
@@ -150,6 +153,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func helperSettings() {
         SMAppService.openSystemSettingsLoginItems()
+    }
+
+    @objc private func toggleLaunchAtLogin() {
+        do {
+            if SMAppService.mainApp.status == .enabled {
+                try SMAppService.mainApp.unregister()
+            } else {
+                try SMAppService.mainApp.register()
+            }
+        } catch {
+            showError("Could not change launch at login", error.localizedDescription)
+        }
+        rebuildMenu()
     }
 
     func connectionMenuItems(for tunnel: Tunnel, status: TunnelStatus) -> [NSMenuItem] {

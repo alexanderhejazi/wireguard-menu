@@ -28,7 +28,7 @@ open "/Applications/WireGuard Menu.app"
 
 ## Use
 
-Click the network icon and choose **Enable password-free control…**. Approve WireGuard Menu under **System Settings → General → Login Items** (called **Login Items & Extensions** on some versions). macOS requires administrator approval for this initial setup. Subsequent Connect, Disconnect, Reconnect, and status checks use the helper without asking for your password. **Helper settings…** opens the same settings if approval is later revoked. Keep the app in `/Applications` so its bundled helper remains accessible after a restart. Distribution to other Macs additionally requires Developer ID signing and notarization.
+Click the network icon and choose **Enable password-free control…**. Approve WireGuard Menu under **System Settings → General → Login Items** (called **Login Items & Extensions** on some versions). macOS requires administrator approval for this initial setup. Subsequent Connect, Disconnect, Reconnect, and status checks use the helper without asking for your password. **Helper settings…** opens the same settings if approval is later revoked. **Launch at login** starts the menu bar app when you log in; tunnels are not reconnected automatically. Keep the app in `/Applications` so its bundled helper remains accessible after a restart. Distribution to other Macs additionally requires Developer ID signing and notarization.
 
 Choose **Add tunnel…**, and select your `.conf` files. Export configurations from the WireGuard app first if needed; disconnect those profiles in that app and disable their on-demand activation before managing them here.
 
