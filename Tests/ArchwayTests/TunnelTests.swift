@@ -1,7 +1,7 @@
 import WireGuardCore
 import XCTest
 import Darwin
-@testable import WireGuardMenu
+@testable import Archway
 
 final class TunnelTests: XCTestCase {
     func testRunningRequiresMatchingSocketAndLiveInterface() throws {

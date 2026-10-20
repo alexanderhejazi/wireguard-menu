@@ -51,7 +51,7 @@ func reconnectTunnel(status: () -> TunnelStatus, run: (String) -> CommandResult)
 
 final class HelperDelegate: NSObject, NSXPCListenerDelegate {
     let clientRequirement: String
-    let commands = DispatchQueue(label: "se.mnilsson.wireguard-menu.commands")
+    let commands = DispatchQueue(label: "se.mnilsson.archway.commands")
 
     init(clientRequirement: String) { self.clientRequirement = clientRequirement }
 
@@ -68,7 +68,7 @@ final class HelperDelegate: NSObject, NSXPCListenerDelegate {
 }
 
 @main
-struct WireGuardHelper {
+struct ArchwayHelper {
     static func main() throws {
         guard geteuid() == 0 else { exit(1) }
         let delegate = HelperDelegate(clientRequirement: try HelperService.peerRequirement(identifier: HelperService.appIdentifier))

@@ -4,7 +4,7 @@ import ServiceManagement
 import UniformTypeIdentifiers
 
 @main
-struct WireGuardMenu {
+struct Archway {
     @MainActor static func main() {
         let app = NSApplication.shared
         let delegate = AppDelegate()
@@ -18,6 +18,8 @@ struct WireGuardMenu {
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var item: NSStatusItem!
     private var timer: Timer?
+    private var updateTimer: Timer?
+    private var availableUpdate: Release?
     private var busyPath: String?
     private let helper = HelperClient()
     private var statuses: [String: TunnelStatus] = [:]
@@ -32,6 +34,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         refreshStatus()
         timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.refreshStatus() }
+        }
+        checkForUpdate()
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 6 * 60 * 60, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.checkForUpdate() }
         }
     }
 
@@ -49,6 +55,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         Task {
             defer { refreshing = false }
             statuses = (try? await helper.statuses(paths: requestedPaths)) ?? [:]
+            rebuildMenu()
+        }
+    }
+
+    private func checkForUpdate() {
+        // Unbundled development runs have no version to compare.
+        guard let current = UpdateChecker.currentVersion else { return }
+        Task {
+            guard let release = try? await UpdateChecker.latestRelease(),
+                  UpdateChecker.isNewer(release.version, than: current) else { return }
+            availableUpdate = release
             rebuildMenu()
         }
     }
@@ -91,6 +108,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             menu.addItem(hint)
         }
         menu.addItem(.separator())
+        if let update = availableUpdate {
+            menu.addItem(entry("Update available: \(update.version)…", action: #selector(showUpdate)))
+        }
         if !helper.isEnabled {
             menu.addItem(entry("Enable password-free control…", action: #selector(enableHelper)))
         }
@@ -109,7 +129,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         quit.isEnabled = busyPath == nil
         menu.addItem(quit)
         item.button?.title = " \(running)/\(paths.count)"
-        item.button?.toolTip = "WireGuard: \(running) of \(paths.count) tunnels running"
+        item.button?.toolTip = "\(running) of \(paths.count) tunnels running"
         item.menu = menu
     }
 
@@ -148,6 +168,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             refreshStatus()
         } catch {
             showError("Could not enable helper", error.localizedDescription)
+        }
+    }
+
+    @objc private func showUpdate() {
+        guard let update = availableUpdate else { return }
+        guard UpdateChecker.installedWithHomebrew else {
+            NSWorkspace.shared.open(update.htmlURL)
+            return
+        }
+        NSApp.activate(ignoringOtherApps: true)
+        let alert = NSAlert()
+        alert.messageText = "Archway \(update.version) is available"
+        alert.informativeText = "Run this command in Terminal, then quit and reopen Archway. Tunnels keep running.\n\n\(UpdateChecker.upgradeCommand)"
+        alert.addButton(withTitle: "Copy Command")
+        alert.addButton(withTitle: "Release Notes")
+        alert.addButton(withTitle: "Not Now")
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(UpdateChecker.upgradeCommand, forType: .string)
+        case .alertSecondButtonReturn:
+            NSWorkspace.shared.open(update.htmlURL)
+        default:
+            break
         }
     }
 

@@ -1,7 +1,7 @@
 import WireGuardCore
 import AppKit
 import XCTest
-@testable import WireGuardMenu
+@testable import Archway
 
 final class TunnelControlsTests: XCTestCase {
     @MainActor

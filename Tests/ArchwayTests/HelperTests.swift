@@ -1,7 +1,7 @@
 import Foundation
 import XCTest
 import WireGuardCore
-@testable import WireGuardHelper
+@testable import ArchwayHelper
 
 final class HelperTests: XCTestCase {
     func testReconnectDisconnectsBeforeConnectingAndReturnsConnectResult() {

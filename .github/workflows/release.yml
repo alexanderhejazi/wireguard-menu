@@ -22,7 +22,7 @@ jobs:
             exit 1
           fi
           echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
-          echo "DMG_PATH=dist/WireGuard-Menu-${TAG#v}-universal.dmg" >> "$GITHUB_ENV"
+          echo "DMG_PATH=dist/Archway-${TAG#v}-universal.dmg" >> "$GITHUB_ENV"
       - name: Test
         run: swift test
       - name: Import Developer ID certificate
@@ -53,15 +53,15 @@ jobs:
           BUILD_NUMBER: ${{ github.run_number }}
         run: |
           bash build.sh --arch arm64 --arch x86_64
-          lipo 'dist/WireGuard Menu.app/Contents/MacOS/WireGuardMenu' -verify_arch arm64 x86_64
-          lipo 'dist/WireGuard Menu.app/Contents/MacOS/WireGuardHelper' -verify_arch arm64 x86_64
+          lipo 'dist/Archway.app/Contents/MacOS/Archway' -verify_arch arm64 x86_64
+          lipo 'dist/Archway.app/Contents/MacOS/ArchwayHelper' -verify_arch arm64 x86_64
       - name: Create and sign disk image
         run: |
           staging="$RUNNER_TEMP/dmg"
           mkdir -p "$staging"
-          ditto 'dist/WireGuard Menu.app' "$staging/WireGuard Menu.app"
+          ditto 'dist/Archway.app' "$staging/Archway.app"
           ln -s /Applications "$staging/Applications"
-          hdiutil create -volname 'WireGuard Menu' -srcfolder "$staging" \
+          hdiutil create -volname 'Archway' -srcfolder "$staging" \
             -fs HFS+ -format UDZO "$DMG_PATH"
           codesign --sign "$SIGNING_IDENTITY" --timestamp "$DMG_PATH"
           hdiutil verify "$DMG_PATH"
@@ -87,7 +87,7 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           gh release create "$TAG" "$DMG_PATH" --verify-tag --draft \
-            --title "WireGuard Menu $VERSION" --generate-notes
+            --title "Archway $VERSION" --generate-notes
       - name: Remove signing credentials
         if: always()
         run: |

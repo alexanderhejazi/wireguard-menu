@@ -2,7 +2,7 @@ import Foundation
 
 struct ConfigurationStore {
     var directory: URL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        .appendingPathComponent("WireGuard Menu/Configurations", isDirectory: true)
+        .appendingPathComponent("Archway/Configurations", isDirectory: true)
 
     func importConfiguration(from source: URL) throws -> URL {
         let fileManager = FileManager.default

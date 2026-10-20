@@ -14,19 +14,20 @@ if [[ -z "$identity" ]]; then
 fi
 swift build -c release "$@"
 bin_path=$(swift build -c release "$@" --show-bin-path)
-app="$(pwd)/dist/WireGuard Menu.app"
+app="$(pwd)/dist/Archway.app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Library/LaunchDaemons" "$app/Contents/Resources"
-cp "$bin_path/WireGuardMenu" "$app/Contents/MacOS/WireGuardMenu"
-cp "$bin_path/WireGuardHelper" "$app/Contents/MacOS/WireGuardHelper"
-cp LICENSE THIRD_PARTY.md "$app/Contents/Resources/"
-cp Resources/se.mnilsson.wireguard-menu.helper.plist "$app/Contents/Library/LaunchDaemons/"
+cp "$bin_path/Archway" "$app/Contents/MacOS/Archway"
+cp "$bin_path/ArchwayHelper" "$app/Contents/MacOS/ArchwayHelper"
+cp LICENSE THIRD_PARTY.md Resources/AppIcon.icns "$app/Contents/Resources/"
+cp Resources/se.mnilsson.archway.helper.plist "$app/Contents/Library/LaunchDaemons/"
 cat > "$app/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-<key>CFBundleIdentifier</key><string>se.mnilsson.wireguard-menu</string>
-<key>CFBundleName</key><string>WireGuard Menu</string>
-<key>CFBundleExecutable</key><string>WireGuardMenu</string>
+<key>CFBundleIdentifier</key><string>se.mnilsson.archway</string>
+<key>CFBundleName</key><string>Archway</string>
+<key>CFBundleExecutable</key><string>Archway</string>
+<key>CFBundleIconFile</key><string>AppIcon</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$version</string>
 <key>CFBundleVersion</key><string>$build_number</string>
@@ -34,7 +35,7 @@ cat > "$app/Contents/Info.plist" <<PLIST
 <key>LSUIElement</key><true/>
 </dict></plist>
 PLIST
-codesign --force --options runtime --timestamp --sign "$identity" --identifier se.mnilsson.wireguard-menu.helper "$app/Contents/MacOS/WireGuardHelper"
+codesign --force --options runtime --timestamp --sign "$identity" --identifier se.mnilsson.archway.helper "$app/Contents/MacOS/ArchwayHelper"
 codesign --force --options runtime --timestamp --sign "$identity" "$app"
 codesign --verify --deep --strict "$app"
 printf 'Built %s\n' "$app"
