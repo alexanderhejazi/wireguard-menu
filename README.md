@@ -13,7 +13,7 @@ brew tap mnilsson/wireguard-menu https://github.com/mnilsson/wireguard-menu
 brew install --cask wireguard-menu
 ```
 
-Update with `brew upgrade`, then quit and reopen the app; tunnels keep running meanwhile. If you previously installed the app manually, add `--adopt` to the install command so Homebrew takes over the existing copy in `/Applications`.
+The app checks GitHub for a newer published release at launch and every six hours, and shows **Update available** in the menu when one exists. For Homebrew installs it gives you the upgrade command; otherwise it opens the release page. Update with `brew upgrade --cask wireguard-menu`, then quit and reopen the app; tunnels keep running meanwhile. If you previously installed the app manually, add `--adopt` to the install command so Homebrew takes over the existing copy in `/Applications`.
 
 Alternatively, install the WireGuard tools with `brew install wireguard-tools wireguard-go` and download the universal DMG from [Releases](https://github.com/mnilsson/wireguard-menu/releases), open it, and drag **WireGuard Menu.app** onto **Applications**. Eject the disk image and open the app from `/Applications`. If no release is available yet, build from source below.
 
