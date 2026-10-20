@@ -6,13 +6,16 @@ Connect, disconnect, or reconnect individual tunnels from the menu bar. This is 
 
 ## Install
 
-Requires macOS 13 or later and Homebrew's WireGuard tools:
+Requires macOS 13 or later and [Homebrew](https://brew.sh). Install with the cask from this repository, which also installs `wireguard-tools` and `wireguard-go`:
 
 ```sh
-brew install wireguard-tools wireguard-go
+brew tap mnilsson/wireguard-menu https://github.com/mnilsson/wireguard-menu
+brew install --cask wireguard-menu
 ```
 
-Download the universal DMG from [Releases](https://github.com/mnilsson/wireguard-menu/releases), open it, and drag **WireGuard Menu.app** onto **Applications**. Eject the disk image and open the app from `/Applications`. If no release is available yet, build from source below.
+Update with `brew upgrade`, then quit and reopen the app; tunnels keep running meanwhile. If you previously installed the app manually, add `--adopt` to the install command so Homebrew takes over the existing copy in `/Applications`.
+
+Alternatively, install the WireGuard tools with `brew install wireguard-tools wireguard-go` and download the universal DMG from [Releases](https://github.com/mnilsson/wireguard-menu/releases), open it, and drag **WireGuard Menu.app** onto **Applications**. Eject the disk image and open the app from `/Applications`. If no release is available yet, build from source below.
 
 ## Build from source
 

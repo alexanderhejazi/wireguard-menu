@@ -29,7 +29,7 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-Use the next unused `vX.Y.Z` tag. The tag sets the app's version; the Actions run number sets its build number. Watch the **Release** workflow, download the DMG from the draft release, open it, and drag **WireGuard Menu.app** onto **Applications**. Eject the disk image and launch the app from `/Applications`. Test Connect, Disconnect, and Reconnect on a Mac with the Homebrew tools installed. Publish the draft when it is ready.
+Use the next unused `vX.Y.Z` tag. The tag sets the app's version; the Actions run number sets its build number. Watch the **Release** workflow, download the DMG from the draft release, open it, and drag **WireGuard Menu.app** onto **Applications**. Eject the disk image and launch the app from `/Applications`. Test Connect, Disconnect, and Reconnect on a Mac with the Homebrew tools installed. Publish the draft when it is ready. Publishing runs [.github/workflows/cask.yml](.github/workflows/cask.yml), which commits the new version and DMG checksum to [Casks/wireguard-menu.rb](Casks/wireguard-menu.rb) on `main` so `brew upgrade` picks up the release.
 
 If signing or notarization fails, fix the credentials or reported issue and rerun the failed workflow. A release is only created after signing, notarization, and Gatekeeper verification succeed. No unsigned fallback is published.
 

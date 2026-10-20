@@ -1,0 +1,34 @@
+name: Update Homebrew cask
+
+# Runs when a draft release is published, so the cask only points at public downloads.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  cask:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - name: Update version and checksum
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version=${TAG#v}
+          gh release download "$TAG" --pattern "WireGuard-Menu-$version-universal.dmg" --dir "$RUNNER_TEMP"
+          sha=$(sha256sum "$RUNNER_TEMP/WireGuard-Menu-$version-universal.dmg" | cut -d ' ' -f 1)
+          sed -i -E "s/^  version \".*\"/  version \"$version\"/; s/^  sha256 \".*\"/  sha256 \"$sha\"/" Casks/wireguard-menu.rb
+          if git diff --quiet; then
+            echo "Cask already points at $version."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -am "Update Homebrew cask to $version"
+          git push
