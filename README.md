@@ -50,7 +50,7 @@ swift test
 
 To exercise connections, approve the helper, add real configurations, and use each tunnel's menu. Verify access to an office service and an AWS service with both tunnels running, then disconnect individually. These actions change networking. Tests cover configuration imports, status detection, command arguments, helper request validation, and rejection of XPC clients with the wrong signature without starting a tunnel.
 
-GitHub Actions runs the tests and a release-mode compile on Apple Silicon and Intel for pull requests and pushes to `main`. Tests do not require an Apple signing identity or installed WireGuard tools. Automated publishing is not configured. See [RELEASING.md](RELEASING.md) for local packaging and distribution prerequisites.
+GitHub Actions runs the tests and a release-mode compile on Apple Silicon and Intel for pull requests and pushes to `main`. Tests do not require an Apple signing identity or installed WireGuard tools. Pushing a `vX.Y.Z` tag runs a separate workflow that signs and notarizes a universal app and creates a draft GitHub release. See [RELEASING.md](RELEASING.md) for setup and release steps.
 
 ## Contributing
 
