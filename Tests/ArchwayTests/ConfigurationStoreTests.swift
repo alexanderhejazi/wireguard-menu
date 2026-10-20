@@ -1,5 +1,5 @@
 import XCTest
-@testable import WireGuardMenu
+@testable import Archway
 
 final class ConfigurationStoreTests: XCTestCase {
     func testImportSurvivesDeletingOriginalAndPreservesEarlierCopies() throws {

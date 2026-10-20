@@ -1,41 +1,41 @@
-# WireGuard Menu
+# Archway
 
 A small native macOS menu bar app for independent `wg-quick` tunnels, with a privileged helper for password-free tunnel control. No package dependencies.
 
-Connect, disconnect, or reconnect individual tunnels from the menu bar. This is an independent project, not an official WireGuard application.
+Connect, disconnect, or reconnect individual tunnels from the menu bar. Archway is an independent project, not affiliated with or endorsed by the WireGuard project. WireGuard is a registered trademark of Jason A. Donenfeld.
 
 ## Install
 
 Requires macOS 13 or later and [Homebrew](https://brew.sh). Install with the cask from this repository, which also installs `wireguard-tools` and `wireguard-go`:
 
 ```sh
-brew tap mnilsson/wireguard-menu https://github.com/mnilsson/wireguard-menu
-brew install --cask wireguard-menu
+brew tap mnilsson/archway https://github.com/mnilsson/archway
+brew install --cask archway
 ```
 
-The app checks GitHub for a newer published release at launch and every six hours, and shows **Update available** in the menu when one exists. For Homebrew installs it gives you the upgrade command; otherwise it opens the release page. Update with `brew upgrade --cask wireguard-menu`, then quit and reopen the app; tunnels keep running meanwhile. If you previously installed the app manually, add `--adopt` to the install command so Homebrew takes over the existing copy in `/Applications`.
+The app checks GitHub for a newer published release at launch and every six hours, and shows **Update available** in the menu when one exists. For Homebrew installs it gives you the upgrade command; otherwise it opens the release page. Update with `brew upgrade --cask archway`, then quit and reopen the app; tunnels keep running meanwhile. If you previously installed the app manually, add `--adopt` to the install command so Homebrew takes over the existing copy in `/Applications`.
 
-Alternatively, install the WireGuard tools with `brew install wireguard-tools wireguard-go` and download the universal DMG from [Releases](https://github.com/mnilsson/wireguard-menu/releases), open it, and drag **WireGuard Menu.app** onto **Applications**. Eject the disk image and open the app from `/Applications`. If no release is available yet, build from source below.
+Alternatively, install the WireGuard tools with `brew install wireguard-tools wireguard-go` and download the universal DMG from [Releases](https://github.com/mnilsson/archway/releases), open it, and drag **Archway.app** onto **Applications**. Eject the disk image and open the app from `/Applications`. If no release is available yet, build from source below.
 
 ## Build from source
 
 Requires macOS 13+, Swift 6+, Homebrew's `wireguard-tools` and `wireguard-go`, and an Apple code-signing identity in your keychain. The build uses the first available identity; set `SIGNING_IDENTITY` to select a different one. The app and helper must be signed by the same team.
 
 ```sh
-git clone https://github.com/mnilsson/wireguard-menu.git
-cd wireguard-menu
+git clone https://github.com/mnilsson/archway.git
+cd archway
 bash build.sh
-ditto "dist/WireGuard Menu.app" "/Applications/WireGuard Menu.app"
-open "/Applications/WireGuard Menu.app"
+ditto "dist/Archway.app" "/Applications/Archway.app"
+open "/Applications/Archway.app"
 ```
 
 ## Use
 
-Click the network icon and choose **Enable password-free control…**. Approve WireGuard Menu under **System Settings → General → Login Items** (called **Login Items & Extensions** on some versions). macOS requires administrator approval for this initial setup. Subsequent Connect, Disconnect, Reconnect, and status checks use the helper without asking for your password. **Helper settings…** opens the same settings if approval is later revoked. **Launch at login** starts the menu bar app when you log in; tunnels are not reconnected automatically. Keep the app in `/Applications` so its bundled helper remains accessible after a restart. Distribution to other Macs additionally requires Developer ID signing and notarization.
+Click the network icon and choose **Enable password-free control…**. Approve Archway under **System Settings → General → Login Items** (called **Login Items & Extensions** on some versions). macOS requires administrator approval for this initial setup. Subsequent Connect, Disconnect, Reconnect, and status checks use the helper without asking for your password. **Helper settings…** opens the same settings if approval is later revoked. **Launch at login** starts the menu bar app when you log in; tunnels are not reconnected automatically. Keep the app in `/Applications` so its bundled helper remains accessible after a restart. Distribution to other Macs additionally requires Developer ID signing and notarization.
 
 Choose **Add tunnel…**, and select your `.conf` files. Export configurations from the WireGuard app first if needed; disconnect those profiles in that app and disable their on-demand activation before managing them here.
 
-Each configuration needs a unique filename with 1–15 letters, digits, or `_ = + . -` characters before `.conf`. Adding a configuration copies it into `~/Library/Application Support/WireGuard Menu/Configurations/`. You can then delete the original, including from Downloads. Connect and Show in Finder use the imported copy; edits to the original do not affect it. Entries added with older versions still use their original paths: remove and re-add them to import a copy. Only select configurations you trust: `wg-quick` supports shell hooks that execute with administrator privileges.
+Each configuration needs a unique filename with 1–15 letters, digits, or `_ = + . -` characters before `.conf`. Adding a configuration copies it into `~/Library/Application Support/Archway/Configurations/`. You can then delete the original, including from Downloads. Connect and Show in Finder use the imported copy; edits to the original do not affect it. Entries added with older versions still use their original paths: remove and re-add them to import a copy. Only select configurations you trust: `wg-quick` supports shell hooks that execute with administrator privileges.
 
 The submenu for each tunnel provides Connect, Disconnect, and Reconnect actions, plus Show in Finder. Reconnect disconnects and then connects the tunnel again, including when it has already stopped. Disconnect and Reconnect remain available when status cannot be read. Quitting leaves tunnels running. Removing a stopped tunnel from the menu does not delete its configuration. The helper accepts requests only from this app signed by the same team, and only operates on `.conf` paths inside the requesting user's home directory. Re-add older configurations stored elsewhere to import them.
 

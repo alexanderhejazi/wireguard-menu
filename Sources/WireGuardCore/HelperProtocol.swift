@@ -2,8 +2,8 @@ import Foundation
 import Security
 
 public enum HelperService {
-    public static let name = "se.mnilsson.wireguard-menu.helper"
-    public static let appIdentifier = "se.mnilsson.wireguard-menu"
+    public static let name = "se.mnilsson.archway.helper"
+    public static let appIdentifier = "se.mnilsson.archway"
     public static let plistName = name + ".plist"
 
     public static func peerRequirement(identifier: String) throws -> String {

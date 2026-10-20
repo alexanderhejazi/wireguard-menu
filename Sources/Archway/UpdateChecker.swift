@@ -13,16 +13,16 @@ struct Release: Decodable {
 
 enum UpdateChecker {
     static let currentVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-    static let upgradeCommand = "brew upgrade --cask wireguard-menu"
+    static let upgradeCommand = "brew upgrade --cask archway"
     static var installedWithHomebrew: Bool {
         ["/opt/homebrew", "/usr/local"].contains {
-            FileManager.default.fileExists(atPath: "\($0)/Caskroom/wireguard-menu")
+            FileManager.default.fileExists(atPath: "\($0)/Caskroom/archway")
         }
     }
 
     /// Drafts and prereleases are excluded by GitHub's latest-release endpoint.
     static func latestRelease() async throws -> Release {
-        var request = URLRequest(url: URL(string: "https://api.github.com/repos/mnilsson/wireguard-menu/releases/latest")!)
+        var request = URLRequest(url: URL(string: "https://api.github.com/repos/mnilsson/archway/releases/latest")!)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
         let (data, _) = try await URLSession.shared.data(for: request)
         return try JSONDecoder().decode(Release.self, from: data)

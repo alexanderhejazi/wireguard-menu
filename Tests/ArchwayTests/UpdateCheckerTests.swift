@@ -1,5 +1,5 @@
 import XCTest
-@testable import WireGuardMenu
+@testable import Archway
 
 final class UpdateCheckerTests: XCTestCase {
     func testComparesVersionComponentsNumerically() {
@@ -10,7 +10,7 @@ final class UpdateCheckerTests: XCTestCase {
     }
 
     func testReadsVersionFromReleaseTag() throws {
-        let json = #"{"tag_name": "v0.2.0", "html_url": "https://github.com/mnilsson/wireguard-menu/releases/tag/v0.2.0"}"#
+        let json = #"{"tag_name": "v0.2.0", "html_url": "https://github.com/mnilsson/archway/releases/tag/v0.2.0"}"#
         let release = try JSONDecoder().decode(Release.self, from: Data(json.utf8))
         XCTAssertEqual(release.version, "0.2.0")
     }

@@ -21,9 +21,9 @@ jobs:
           TAG: ${{ github.event.release.tag_name }}
         run: |
           version=${TAG#v}
-          gh release download "$TAG" --pattern "WireGuard-Menu-$version-universal.dmg" --dir "$RUNNER_TEMP"
-          sha=$(sha256sum "$RUNNER_TEMP/WireGuard-Menu-$version-universal.dmg" | cut -d ' ' -f 1)
-          sed -i -E "s/^  version \".*\"/  version \"$version\"/; s/^  sha256 \".*\"/  sha256 \"$sha\"/" Casks/wireguard-menu.rb
+          gh release download "$TAG" --pattern "Archway-$version-universal.dmg" --dir "$RUNNER_TEMP"
+          sha=$(sha256sum "$RUNNER_TEMP/Archway-$version-universal.dmg" | cut -d ' ' -f 1)
+          sed -i -E "s/^  version \".*\"/  version \"$version\"/; s/^  sha256 .*/  sha256 \"$sha\"/" Casks/archway.rb
           if git diff --quiet; then
             echo "Cask already points at $version."
             exit 0

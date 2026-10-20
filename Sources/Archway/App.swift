@@ -4,7 +4,7 @@ import ServiceManagement
 import UniformTypeIdentifiers
 
 @main
-struct WireGuardMenu {
+struct Archway {
     @MainActor static func main() {
         let app = NSApplication.shared
         let delegate = AppDelegate()
@@ -129,7 +129,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         quit.isEnabled = busyPath == nil
         menu.addItem(quit)
         item.button?.title = " \(running)/\(paths.count)"
-        item.button?.toolTip = "WireGuard: \(running) of \(paths.count) tunnels running"
+        item.button?.toolTip = "\(running) of \(paths.count) tunnels running"
         item.menu = menu
     }
 
@@ -179,8 +179,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         NSApp.activate(ignoringOtherApps: true)
         let alert = NSAlert()
-        alert.messageText = "WireGuard Menu \(update.version) is available"
-        alert.informativeText = "Run this command in Terminal, then quit and reopen WireGuard Menu. Tunnels keep running.\n\n\(UpdateChecker.upgradeCommand)"
+        alert.messageText = "Archway \(update.version) is available"
+        alert.informativeText = "Run this command in Terminal, then quit and reopen Archway. Tunnels keep running.\n\n\(UpdateChecker.upgradeCommand)"
         alert.addButton(withTitle: "Copy Command")
         alert.addButton(withTitle: "Release Notes")
         alert.addButton(withTitle: "Not Now")

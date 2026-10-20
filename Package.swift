@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "WireGuardMenu",
+    name: "Archway",
     platforms: [.macOS(.v13)],
     targets: [
         .target(name: "WireGuardCore"),
-        .executableTarget(name: "WireGuardMenu", dependencies: ["WireGuardCore"]),
-        .executableTarget(name: "WireGuardHelper", dependencies: ["WireGuardCore"]),
-        .testTarget(name: "WireGuardMenuTests", dependencies: ["WireGuardMenu", "WireGuardCore", "WireGuardHelper"])
+        .executableTarget(name: "Archway", dependencies: ["WireGuardCore"]),
+        .executableTarget(name: "ArchwayHelper", dependencies: ["WireGuardCore"]),
+        .testTarget(name: "ArchwayTests", dependencies: ["Archway", "WireGuardCore", "ArchwayHelper"])
     ]
 )
