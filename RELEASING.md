@@ -1,6 +1,6 @@
 # Releases
 
-Pushing a tag such as `v0.1.0` runs [.github/workflows/release.yml](.github/workflows/release.yml). It tests the code, builds a universal macOS app (Apple Silicon and Intel), signs the app and helper, notarizes and staples the app, and attaches a ZIP to a **draft** GitHub release. The ZIP includes the project license and external-tool notices inside the app bundle. WireGuard tools remain a separate Homebrew installation.
+Pushing a tag such as `v0.1.0` runs [.github/workflows/release.yml](.github/workflows/release.yml). It tests the code, builds a universal macOS app (Apple Silicon and Intel), signs the app and helper, packages them in a signed DMG, notarizes and staples the DMG, and attaches it to a **draft** GitHub release. The disk image contains the app and an Applications shortcut for drag-and-drop installation. The project license and external-tool notices are included inside the app bundle. WireGuard tools remain a separate Homebrew installation.
 
 ## One-time setup
 
@@ -29,7 +29,7 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-Use the next unused `vX.Y.Z` tag. The tag sets the app's version; the Actions run number sets its build number. Watch the **Release** workflow, download the ZIP from the draft release, and test installation and Connect, Disconnect, and Reconnect on a Mac with the Homebrew tools installed. Publish the draft when it is ready.
+Use the next unused `vX.Y.Z` tag. The tag sets the app's version; the Actions run number sets its build number. Watch the **Release** workflow, download the DMG from the draft release, open it, and drag **WireGuard Menu.app** onto **Applications**. Eject the disk image and launch the app from `/Applications`. Test Connect, Disconnect, and Reconnect on a Mac with the Homebrew tools installed. Publish the draft when it is ready.
 
 If signing or notarization fails, fix the credentials or reported issue and rerun the failed workflow. A release is only created after signing, notarization, and Gatekeeper verification succeed. No unsigned fallback is published.
 
