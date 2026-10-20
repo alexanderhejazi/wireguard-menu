@@ -1,6 +1,6 @@
 cask "archway" do
   version "0.2.0"
-  sha256 :no_check
+  sha256 "0720e0e376418c103b79347a18277d5644247e28aefa369a7a5b21deaf61d08a"
 
   url "https://github.com/mnilsson/archway/releases/download/v#{version}/Archway-#{version}-universal.dmg"
   name "Archway"
