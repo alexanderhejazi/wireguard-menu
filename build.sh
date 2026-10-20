@@ -18,7 +18,7 @@ app="$(pwd)/dist/WireGuard Menu.app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Library/LaunchDaemons" "$app/Contents/Resources"
 cp "$bin_path/WireGuardMenu" "$app/Contents/MacOS/WireGuardMenu"
 cp "$bin_path/WireGuardHelper" "$app/Contents/MacOS/WireGuardHelper"
-cp LICENSE THIRD_PARTY.md "$app/Contents/Resources/"
+cp LICENSE THIRD_PARTY.md Resources/AppIcon.icns "$app/Contents/Resources/"
 cp Resources/se.mnilsson.wireguard-menu.helper.plist "$app/Contents/Library/LaunchDaemons/"
 cat > "$app/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -27,6 +27,7 @@ cat > "$app/Contents/Info.plist" <<PLIST
 <key>CFBundleIdentifier</key><string>se.mnilsson.wireguard-menu</string>
 <key>CFBundleName</key><string>WireGuard Menu</string>
 <key>CFBundleExecutable</key><string>WireGuardMenu</string>
+<key>CFBundleIconFile</key><string>AppIcon</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$version</string>
 <key>CFBundleVersion</key><string>$build_number</string>
