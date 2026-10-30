@@ -4,10 +4,15 @@ import WireGuardCore
 final class HelperSession: NSObject, WireGuardHelperProtocol {
     let home: URL
     let commands: DispatchQueue
+    let resolvers: ResolverFiles
+    let runtimeDirectory: URL
 
-    init(home: URL, commands: DispatchQueue) {
+    init(home: URL, commands: DispatchQueue, resolvers: ResolverFiles = ResolverFiles(),
+         runtimeDirectory: URL = URL(fileURLWithPath: "/var/run/archway", isDirectory: true)) {
         self.home = home
         self.commands = commands
+        self.resolvers = resolvers
+        self.runtimeDirectory = runtimeDirectory
     }
 
     func statuses(_ paths: [String], withReply reply: @escaping @Sendable (Data) -> Void) {
@@ -15,6 +20,7 @@ final class HelperSession: NSObject, WireGuardHelperProtocol {
             (path, validateConfigurationPath(path, home: home) ? Tunnel(path: path).status() : .unknown)
         }, uniquingKeysWith: { first, _ in first })
         reply((try? JSONEncoder().encode(statuses)) ?? Data())
+        commands.async { [resolvers] in resolvers.removeStale() }
     }
 
     func change(_ path: String, action: String, withReply reply: @escaping @Sendable (Int32, String) -> Void) {
@@ -22,6 +28,7 @@ final class HelperSession: NSObject, WireGuardHelperProtocol {
             reply(-1, "Select a .conf file inside your home folder and use Connect, Disconnect, or Reconnect.")
             return
         }
+        let resolvers = resolvers, runtimeDirectory = runtimeDirectory
         commands.async {
             guard let executable = ["/opt/homebrew/bin/wg-quick", "/usr/local/bin/wg-quick"]
                 .first(where: { FileManager.default.isExecutableFile(atPath: $0) }) else {
@@ -29,10 +36,12 @@ final class HelperSession: NSObject, WireGuardHelperProtocol {
                 return
             }
             let run = { (command: String) in
-                runCommand("/usr/bin/env", arguments: [
-                    "-i", "PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
-                    "HOME=/var/root", executable, command, path
-                ])
+                runWGQuick(command, path: path, runtimeDirectory: runtimeDirectory, resolvers: resolvers) { configuration in
+                    runCommand("/usr/bin/env", arguments: [
+                        "-i", "PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+                        "HOME=/var/root", executable, command, configuration
+                    ])
+                }
             }
             let result = action == .reconnect
                 ? reconnectTunnel(status: { Tunnel(path: path).status() }, run: run)
@@ -40,6 +49,37 @@ final class HelperSession: NSObject, WireGuardHelperProtocol {
             reply(result.code, result.output)
         }
     }
+}
+
+/// Runs wg-quick on a copy of the configuration without DNS lines, and applies its DNS as per-domain resolvers instead.
+func runWGQuick(_ command: String, path: String, runtimeDirectory: URL, resolvers: ResolverFiles,
+                status: (Tunnel) -> TunnelStatus = { $0.status() },
+                run: (String) -> CommandResult) -> CommandResult {
+    let tunnel = Tunnel(path: path)
+    let copy = runtimeDirectory.appendingPathComponent(tunnel.name + ".conf")
+    let dns: SplitDNS
+    do {
+        let extracted = extractDNS(from: try String(contentsOfFile: path, encoding: .utf8))
+        dns = extracted.dns
+        try FileManager.default.createDirectory(at: runtimeDirectory, withIntermediateDirectories: true,
+                                                attributes: [.posixPermissions: 0o700])
+        try? FileManager.default.removeItem(at: copy)
+        // The copy keeps the original filename because wg-quick derives the interface name from it.
+        guard FileManager.default.createFile(atPath: copy.path, contents: Data(extracted.configuration.utf8),
+                                             attributes: [.posixPermissions: 0o600]) else {
+            throw CocoaError(.fileWriteUnknown)
+        }
+    } catch {
+        return CommandResult(code: -1, output: "Could not prepare \(tunnel.name).conf: \(error.localizedDescription)")
+    }
+    defer { try? FileManager.default.removeItem(at: copy) }
+    let result = run(copy.path)
+    if command == TunnelAction.up.rawValue, result.code == 0 {
+        resolvers.install(dns, tunnel: tunnel.name)
+    } else if command == TunnelAction.down.rawValue, status(tunnel) == .stopped {
+        resolvers.remove(tunnel: tunnel.name)
+    }
+    return result
 }
 
 func reconnectTunnel(status: () -> TunnelStatus, run: (String) -> CommandResult) -> CommandResult {

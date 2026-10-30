@@ -43,7 +43,11 @@ The submenu for each tunnel provides Connect, Disconnect, and Reconnect actions,
 
 The icon counts confirmed running tunnels. Status refreshes every three seconds and when opening the menu. The helper reads WireGuard's root-only status files. **Running** means the `wg-quick` mapping, matching control socket, and macOS network interface exist. It does not claim a recent handshake or remote service reachability. A missing or unavailable helper, or unreadable state, is shown as **Status unavailable**. This does not mean the tunnel is stopped; all connection actions remain available when no command is in progress.
 
-This wraps the command-line tools, not profiles managed by the official WireGuard app. The app doesn't modify routes, keys, or DNS settings in configurations. For simultaneous office and AWS access, configure each tunnel's `AllowedIPs` for its destination networks. Overlapping networks/default routes and competing DNS settings need to be resolved in the configurations.
+This wraps the command-line tools, not profiles managed by the official WireGuard app. The app doesn't modify routes or keys in configurations. For simultaneous office and AWS access, configure each tunnel's `AllowedIPs` for its destination networks. Overlapping networks and default routes need to be resolved in the configurations.
+
+## DNS
+
+Archway applies a tunnel's `DNS` line as split DNS instead of passing it to `wg-quick`, which would replace DNS for every network service and keep rewriting it while the tunnel is up. Its servers answer only for the domains listed on the same line, through a file per domain in `/etc/resolver`. For example, `DNS = 10.1.0.2, prd.example.dev` sends lookups for `prd.example.dev` and its subdomains to `10.1.0.2` and leaves all other lookups to your normal DNS. A `DNS` line without a domain has no effect: add the domains the servers should answer for. Domains are not added to the search list, so use full names. Archway removes its resolver files when the tunnel disconnects or is found stopped, and never replaces resolver files it didn't create.
 
 ## Verify
 
